@@ -47,4 +47,12 @@
 #define ML_KEM_768_CTEXT  1088
 #define ML_KEM_1024_CTEXT 1568
 
+typedef uint16_t Poly[ML_KEM_N];  // N = 256
+typedef Poly Vec512[ML_KEM_512_K];
+typedef Poly Vec768[ML_KEM_768_K];
+typedef Poly Vec1024[ML_KEM_1024_K];
+typedef Poly Mat512[ML_KEM_512_K][ML_KEM_512_K];
+typedef Poly Mat768[ML_KEM_768_K][ML_KEM_768_K];
+typedef Poly Mat1024[ML_KEM_1024_K][ML_KEM_1024_K];
+
 #endif

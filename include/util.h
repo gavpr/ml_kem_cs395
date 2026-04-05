@@ -4,12 +4,6 @@
 #include <stdint.h>
 #include "params.h"
 
-//functions to imploement quickly
-
-//byte_encode
-//byte decode
-//compress
-//decompress
 
 // convert a bit array into array of bytes
 void bits_to_bytes(const uint8_t* b, uint8_t* B, int l);
