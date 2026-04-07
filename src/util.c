@@ -28,7 +28,7 @@ void bytes_to_bits(const uint8_t* B, uint8_t* b, int l) {
     free(C);
 }
 
-void byte_encode(const uint16_t F[ML_KEM_N], uint8_t* B, uint8_t d) {
+void byte_encode(const poly F, uint8_t* B, uint8_t d) {
     uint16_t m = 0;
     uint16_t a = 0;
     uint8_t b[256*12];
@@ -40,7 +40,7 @@ void byte_encode(const uint16_t F[ML_KEM_N], uint8_t* B, uint8_t d) {
     }
 
     for(int i = 0; i < 256; i++) {
-        a = F[i] % m;
+        a = (uint16_t)F[i] % m;
         for(int j = 0; j < d; j++) {
             b[(i*d) + j] = a % 2;
             a = (a - b[(i*d) + j])/2;
@@ -49,9 +49,9 @@ void byte_encode(const uint16_t F[ML_KEM_N], uint8_t* B, uint8_t d) {
     bits_to_bytes(b, B, 32*d); 
 }
 
-void byte_decode(const uint8_t* B, uint16_t F[ML_KEM_N], uint8_t d) {
+void byte_decode(const uint8_t* B, poly F, uint8_t d) {
     uint16_t m = 0;
-    uint8_t b[32*8*12];
+    uint8_t b[32*8*d];
     if(d < 12) {
         m = 1 << d;
     }
@@ -65,13 +65,13 @@ void byte_decode(const uint8_t* B, uint16_t F[ML_KEM_N], uint8_t d) {
         for(int j = 0; j < d; j++) {
             res += (b[(i*d) + j] * (1 << j)) % m;
         }
-        F[i] = res;
+        F[i] = (int16_t)res;
     }
 }
 
 
 uint16_t compress(const uint16_t x, uint8_t d) {
-    if(d >= 12) {
+    if(d > 12) {
         return 1;
     }
 
@@ -82,7 +82,7 @@ uint16_t compress(const uint16_t x, uint8_t d) {
 }
 
 uint16_t decompress(const uint16_t y, uint8_t d) {
-    if(d >= 12) {
+    if(d > 12) {
         return 1;
     }
 

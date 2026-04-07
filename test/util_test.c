@@ -99,7 +99,7 @@ void test_cbd_output_range() {
 int main() {
     //test_bit_to_byte();
     //test_roundtrip();
-    //test_byte_encode_round_trip();
+    test_byte_encode_round_trip();
     //int_compression_test();
     //test_cbd_output_range();
 

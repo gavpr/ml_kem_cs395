@@ -47,4 +47,59 @@
 #define ML_KEM_768_CTEXT  1088
 #define ML_KEM_1024_CTEXT 1568
 
+//groupings of parameter sets for parameter passing
+
+typedef struct {
+    uint16_t k;
+    uint16_t eta1;
+    uint16_t eta2;
+    uint16_t du;
+    uint16_t dv;
+    uint16_t rbg;
+    uint16_t ek_size;
+    uint16_t dk_size;
+    uint16_t ctext_size;
+} ml_kem_params;
+
+//vec[i] contains i polynomials
+typedef int16_t poly[ML_KEM_N];    //coefficient array of len N = 256
+typedef poly vec[ML_KEM_1024_K];
+typedef poly mat[ML_KEM_1024_K][ML_KEM_1024_K];
+
+static const ml_kem_params ML_KEM_512 = {
+    .k = ML_KEM_512_K,
+    .eta1 = ML_KEM_512_ETA1,
+    .eta2 = ML_KEM_512_ETA2,
+    .du = ML_KEM_512_DU,
+    .dv = ML_KEM_512_DV,
+    .rbg = ML_KEM_512_RBG,
+    .ek_size = ML_KEM_512_EK,
+    .dk_size = ML_KEM_512_DK,
+    .ctext_size = ML_KEM_512_CTEXT
+};
+
+static const ml_kem_params ML_KEM_768 = {
+    .k = ML_KEM_768_K,
+    .eta1 = ML_KEM_768_ETA1,
+    .eta2 = ML_KEM_768_ETA2,
+    .du = ML_KEM_768_DU,
+    .dv = ML_KEM_768_DV,
+    .rbg = ML_KEM_768_RBG,
+    .ek_size = ML_KEM_768_EK,
+    .dk_size = ML_KEM_768_DK,
+    .ctext_size = ML_KEM_768_CTEXT
+};
+
+static const ml_kem_params ML_KEM_1024 = {
+    .k = ML_KEM_1024_K,
+    .eta1 = ML_KEM_1024_ETA1,
+    .eta2 = ML_KEM_1024_ETA2,
+    .du = ML_KEM_1024_DU,
+    .dv = ML_KEM_1024_DV,
+    .rbg = ML_KEM_1024_RBG,
+    .ek_size = ML_KEM_1024_EK,
+    .dk_size = ML_KEM_1024_DK,
+    .ctext_size = ML_KEM_1024_CTEXT
+};
+
 #endif

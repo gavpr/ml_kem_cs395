@@ -49,7 +49,7 @@ const int16_t zeta_mul[128] =
     2110, -2110, 2935, -2935, 885, -885, 2154, -2154 };
 
 //take polynomial f and transform it into its NTT translation
-void ntt(int16_t f[ML_KEM_N]){
+void ntt(poly f){
     uint32_t i = 1;
     int32_t zeta, t;
 
@@ -67,7 +67,7 @@ void ntt(int16_t f[ML_KEM_N]){
 }
 
 //inverse of ntt (NTT translation back into regular polynomial)
-void ntt_inv(int16_t fhat[ML_KEM_N]){
+void ntt_inv(poly fhat){
     uint32_t i = 127;
     int32_t zeta, t;
 
@@ -91,7 +91,7 @@ void ntt_inv(int16_t fhat[ML_KEM_N]){
 //compute the product of two NTT represented polynomials and return an NTT representation of the product
 //input: fhat, ghat
 //output: hhat
-void multiply_ntts(const int16_t fhat[ML_KEM_N], const int16_t ghat[ML_KEM_N], int16_t hhat[ML_KEM_N]) {
+void multiply_ntts(const poly fhat, const poly ghat, poly hhat) {
     int16_t c0 = 0, c1 = 0;
     for(int i = 0; i < 128; i++) {
         base_case_multiply(fhat[2*i], fhat[(2*i) + 1], ghat[2*i], ghat[(2*i) + 1], zeta_mul[i], &c0, &c1);
