@@ -1,5 +1,6 @@
 #include "../include/params.h"
 #include "../include/util.h"
+#include "../include/sample.h"
 #include <stdio.h>
 #include <assert.h>
 
@@ -80,9 +81,26 @@ void int_compression_test() {
     printf("Passed tests for compression testing (roundtrip)\n");
 }
 
+void test_cbd_output_range() {
+    uint8_t B[128] = {
+        0xA3, 0x4D, 0x7F, 0x12, 0};
+    uint16_t f[256];
+    sample_poly_cbd(B, f, 2);
+
+    // all values must be <= eta or >= q-eta
+    // i.e. the centered values are in {-2,-1,0,1,2}
+    for (int i = 0; i < 256; i++) {
+        printf("%d ", f[i]);
+        assert(f[i] <= 2 || f[i] >= ML_KEM_Q - 2);
+    }
+    printf("PASSED: output range eta=2\n");
+}
+
 int main() {
     //test_bit_to_byte();
     //test_roundtrip();
     //test_byte_encode_round_trip();
     //int_compression_test();
+    //test_cbd_output_range();
+
 }
