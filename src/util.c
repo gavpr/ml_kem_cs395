@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
+#include <stdlib.h>
 #include "util.h"
 
 void bits_to_bytes(const uint8_t* b, uint8_t* B, int l) {
@@ -29,7 +31,7 @@ void bytes_to_bits(const uint8_t* B, uint8_t* b, int l) {
 void byte_encode(const uint16_t F[ML_KEM_N], uint8_t* B, uint8_t d) {
     uint16_t m = 0;
     uint16_t a = 0;
-    uint8_t b[256*d];
+    uint8_t b[256*12];
     if(d < 12) {
         m = 1 << d;
     }
@@ -65,4 +67,26 @@ void byte_decode(const uint8_t* B, uint16_t F[ML_KEM_N], uint8_t d) {
         }
         F[i] = res;
     }
+}
+
+
+uint16_t compress(const uint16_t x, uint8_t d) {
+    if(d >= 12) {
+        return 1;
+    }
+
+    uint16_t mod = (1 << d);
+    uint16_t out = ((mod * x) + (ML_KEM_Q / 2)) / ML_KEM_Q;
+    out = out % mod;
+    return out;
+}
+
+uint16_t decompress(const uint16_t y, uint8_t d) {
+    if(d >= 12) {
+        return 1;
+    }
+
+    uint16_t mod = (1 << d);
+    uint16_t out = ((ML_KEM_Q * y) + (mod / 2)) / mod;
+    return out;
 }

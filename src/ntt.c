@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <assert.h>
 
-#define ROOT_OF_UNITY 17;
+//#define ROOT_OF_UNITY 17;
 
 //precomputed values for zeta operations of ntt 
 //each value represents 17^(bit_rev_7(i)) mod ML_KEM_Q
