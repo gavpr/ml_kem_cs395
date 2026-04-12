@@ -11,6 +11,7 @@
 #define ML_KEM_512_K  2
 #define ML_KEM_768_K  3
 #define ML_KEM_1024_K 4
+#define ML_KEM_K_MAX 4
 
 #define ML_KEM_512_ETA1  3
 #define ML_KEM_768_ETA1  2
@@ -63,8 +64,8 @@ typedef struct {
 
 //vec[i] contains i polynomials
 typedef int16_t poly[ML_KEM_N];    //coefficient array of len N = 256
-typedef poly vec[ML_KEM_1024_K];
-typedef poly mat[ML_KEM_1024_K][ML_KEM_1024_K];
+typedef poly vec[ML_KEM_K_MAX];
+typedef poly matrix[ML_KEM_K_MAX][ML_KEM_K_MAX];
 
 static const ml_kem_params ML_KEM_512 = {
     .k = ML_KEM_512_K,

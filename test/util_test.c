@@ -3,6 +3,8 @@
 #include "../include/sample.h"
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
+#include "fips202.h"
 
 void test_bit_to_byte() {
     
@@ -46,7 +48,7 @@ void test_roundtrip(void) {
 }
 
 void test_byte_encode_round_trip() {
-    uint16_t F[ML_KEM_N];
+    poly F;
     for (int i = 0; i < ML_KEM_N; i++) F[i] = i % 3329;
     uint8_t d = 10;
     for (int i = 0; i < ML_KEM_N; i++) {
@@ -54,7 +56,7 @@ void test_byte_encode_round_trip() {
     }
     printf("\n\n");
     uint8_t out[d*32];
-    uint16_t recovered[ML_KEM_N];
+    poly recovered;
     byte_encode(F, out, d);
     for (int i = 0; i < d*32; i++) {
         printf("%d ", out[i]);
@@ -84,7 +86,7 @@ void int_compression_test() {
 void test_cbd_output_range() {
     uint8_t B[128] = {
         0xA3, 0x4D, 0x7F, 0x12, 0};
-    uint16_t f[256];
+    poly f;
     sample_poly_cbd(B, f, 2);
 
     // all values must be <= eta or >= q-eta
@@ -96,11 +98,31 @@ void test_cbd_output_range() {
     printf("PASSED: output range eta=2\n");
 }
 
+void test_sample_ntt() {
+    uint8_t rho[] = {0xed, 0x85, 0x90, 0x32, 0xbb, 0xb7,
+        0x4c, 0x74, 0x12, 0xa7, 0x27, 0x1c, 0x8e, 0xf2, 0x3a,
+        0x5a, 0x08, 0xc3, 0x15, 0x51, 0xa2, 0xa5, 0xcb, 0x8a, 
+        0xda, 0x78, 0x53, 0x8c, 0xe6, 0xc9, 0x6d, 0x11};  // first 32 bytes of ek
+
+    uint8_t input[34];
+    memcpy(input, rho, 32);
+    input[32] = 0;  // j
+    input[33] = 0;  // i  — gives A^T[0][0]
+
+    poly a_hat;
+    sample_ntt(input, a_hat, 34);
+
+    // compare against A^T[0][0] from file
+    // A^T is hex encoded with ByteDecode12, so you need to
+    // ByteDecode12 the first 384 bytes of A^T to get coefficients
+}
+
+
 int main() {
     //test_bit_to_byte();
     //test_roundtrip();
-    test_byte_encode_round_trip();
+    //test_byte_encode_round_trip();
     //int_compression_test();
     //test_cbd_output_range();
-
+    test_sample_ntt();
 }
