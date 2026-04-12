@@ -3,7 +3,10 @@ Implementation of FIPS 203 Module-Lattice-Based Key-Encapsulation Mechanism Stan
 
 ## Dependencies
 
-This implementation uses the following libraries:
+This implementation uses the following library:
 
-OpenSSL:  https://github.com/openssl/openssl  
-XKCP:     https://github.com/XKCP/XKCP  
+PQClean: https://github.com/PQClean/PQClean/tree/master/common
+  Used For:
+  - Random byte generation
+  - FIPS 202 hashing functions (SHAKE128, SHAKE256, SHA3-256, SHA3-512)
+  - Imported in /include/fips202.h and /include/randombytes.h
