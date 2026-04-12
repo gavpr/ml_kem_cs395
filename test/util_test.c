@@ -98,23 +98,55 @@ void test_cbd_output_range() {
     printf("PASSED: output range eta=2\n");
 }
 
-void test_sample_ntt() {
-    uint8_t rho[] = {0xed, 0x85, 0x90, 0x32, 0xbb, 0xb7,
-        0x4c, 0x74, 0x12, 0xa7, 0x27, 0x1c, 0x8e, 0xf2, 0x3a,
-        0x5a, 0x08, 0xc3, 0x15, 0x51, 0xa2, 0xa5, 0xcb, 0x8a, 
-        0xda, 0x78, 0x53, 0x8c, 0xe6, 0xc9, 0x6d, 0x11};  // first 32 bytes of ek
+// first 32 bytes of ek from the file
+static const uint8_t rho[] = {
+    0xed, 0x85, 0x90, 0x32, 0xbb, 0xb7, 0x4c, 0x74,
+    0x12, 0xa7, 0x27, 0x1c, 0x8e, 0xf2, 0x3a, 0x5a,
+    0x08, 0xc3, 0x15, 0x51, 0xa2, 0xa5, 0xcb, 0x8a,
+    0xda, 0x78, 0x53, 0x8c, 0xe6, 0xc9, 0x6d, 0x11
+};
 
+// first 384 bytes of A^T from the file (A^T[0][0])
+static const uint8_t a_hat_00_bytes[] = {
+    0xc5, 0x64, 0x13, 0x30, 0x68, 0x89, 0xf2, 0xb8,
+    0x76, 0xd8, 0x53, 0x8d, 0xb0, 0x48, 0x08, 0x1e,
+    0x25, 0xbc, 0x72, 0xa2, 0x87, 0xde, 0x4b, 0x34,
+    0xb5, 0xcb, 0x5c, 0x72, 0x3a, 0x97, 0xa7, 0x50,
+    // ... paste all 384 bytes from A^T
+};
+
+void test_sample_ntt() {
     uint8_t input[34];
     memcpy(input, rho, 32);
     input[32] = 0;  // j
-    input[33] = 0;  // i  — gives A^T[0][0]
+    input[33] = 0;  // i  →  gives A^T[0][0]
 
-    poly a_hat;
-    sample_ntt(input, a_hat, 34);
+    // run sample_ntt
+    poly result;
+    sample_ntt(input, result, 34);
 
-    // compare against A^T[0][0] from file
-    // A^T is hex encoded with ByteDecode12, so you need to
-    // ByteDecode12 the first 384 bytes of A^T to get coefficients
+    // decode the expected polynomial from bytes using byte_decode d=12
+    poly expected;
+    byte_decode(a_hat_00_bytes, expected, 12);
+
+    // compare
+    int pass = 1;
+    for(int i = 0; i < ML_KEM_N; i++) {
+        if(result[i] != expected[i]) {
+            printf("MISMATCH at index %d: got %d expected %d\n",
+                   i, result[i], expected[i]);
+            pass = 0;
+        }
+    }
+
+    if(pass) {
+        printf("sample_ntt A^T[0][0] PASSED\n");
+    }
+}
+
+int main() {
+    test_sample_ntt();
+    return 0;
 }
 
 

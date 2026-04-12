@@ -7,6 +7,99 @@
 #include <stdlib.h>
 
 
+//uses randomness to generate an encryption key and a corresponding decryption key
+void k_pke_keygen(const uint8_t d[], uint8_t ek[], uint8_t dk[], const ml_kem_params *params){
+    uint8_t G_output[64];
+    uint8_t G_input[33];    
+    memcpy(G_input, d, 32);
+    G_input[32] = params->k; 
+    sha3_512(G_output, G_input, 32);
+    
+    //separate the two pseudorandom keys;
+    uint8_t rho[32];
+    uint8_t sigma[32];
+    memcpy(rho, G_output, 32);
+    memcpy(sigma, G_output + 32, 32);
+
+    uint16_t N = 0;
+
+    //construct matrix A_hat
+    matrix A_hat;
+    for(uint16_t i = 0; i < params->k; i++) {
+        for(uint16_t j = 0; j < params->k; j++) {
+            uint8_t input_buffer[34];
+            memcpy(input_buffer, rho, 32);
+            input_buffer[32] = j;   //33 byte
+            input_buffer[33] = i;   //34 byte
+            sample_ntt(input_buffer, A_hat[i][j], 34);
+        }
+    }
+
+    vec s; //sampled from cbd
+    for(uint16_t i = 0; i < params->k; i++) {
+        uint8_t input_buffer[33];
+        memcpy(input_buffer, sigma, 32);
+        input_buffer[32] = N;
+        uint8_t output_buffer[64 * params->eta1];
+        shake256(output_buffer, sizeof(output_buffer), input_buffer, sizeof(input_buffer));
+        sample_poly_cbd(output_buffer, s[i], params->eta1);
+        N++;
+    }
+
+    vec e; //sampled from cbd
+    for(uint16_t i = 0; i < params->k; i++) {
+        uint8_t input_buffer[33];
+        memcpy(input_buffer, sigma, 32);
+        input_buffer[32] = N;
+        uint8_t output_buffer[64 * params->eta1];
+        shake256(output_buffer, sizeof(output_buffer), input_buffer, sizeof(input_buffer));
+        sample_poly_cbd(output_buffer, e[i], params->eta1);
+        N++;
+    }
+
+    //s -> s_hat
+    //e -> e_hat
+    vec s_hat;
+    vec e_hat;
+    memcpy(s_hat, s, sizeof(vec));
+    memcpy(e_hat, e, sizeof(vec));
+    for(uint16_t i = 0; i < params->k; i++) {
+        ntt(s_hat[i]);
+        ntt(e_hat[i]);
+    }
+
+    //compute t_hat
+    vec t_hat;
+    for(uint16_t i = 0; i < params->k; i++) {
+        poly tp = {0};
+        for(uint16_t j = 0; j < params->k; j++) {
+            poly mult_output;
+            multiply_ntts(A_hat[i][j], s_hat[j], mult_output);
+            for(uint16_t l = 0; l < ML_KEM_N; l++) {
+                tp[l] = (tp[l] + mult_output[l]) % ML_KEM_Q;
+            }
+        }
+        for(uint16_t l = 0; l < ML_KEM_N; l++) {
+            t_hat[i][l] = (tp[l] + e_hat[i][l]) % ML_KEM_Q;
+        }
+    }
+
+    //compute keys
+    for(uint16_t i = 0; i < params->k; i++) {
+        uint8_t *ek_buffer = ek + (384 * i);
+        byte_encode(t_hat[i], ek_buffer, 12);
+    }
+
+    //append the seed to ek
+    memcpy(ek + (384 * params->k), rho, 32);
+
+    for(uint16_t i = 0; i < params->k; i++) {
+        uint8_t *dk_buffer = dk + (384 * i);
+        byte_encode(s_hat[i], dk_buffer, 12);
+    }
+}
+
+
 //uses encryption key to encrypt a plaintext message using randomness r
 void k_pke_encrypt(const uint8_t ek[], const uint8_t m[], const uint8_t r[], uint8_t c[], const ml_kem_params *params){
     uint8_t N = 0;
@@ -180,4 +273,5 @@ void k_pke_decrypt(const uint8_t dk[], const uint8_t c[], uint8_t m[], const ml_
 
     byte_encode(w, m, 1);
 }
+
 

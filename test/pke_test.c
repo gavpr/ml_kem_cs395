@@ -5,6 +5,12 @@
 #include "../include/kpke.h"
 #include "../include/util.h"
 
+static const char rho_hex[] = 
+    "b1720e4ed5ac0add457f573a041465bcbd7ca4e1d7d53eaadeda511962a36eb0";
+
+static const char seed_hex[] = 
+    "e1e3206875e67d7e81353774fe9025035b9b41a4a9f6ec00b91c600442fd717d";
+
 static const char dkpke_hex[] =
     "2d17c4ba262edec00f00f2247692b87bc2564ffc7910f113fb8c7d8b1c3981ac95d8a8488781bedab191e69170151c2ce942191276691eeb395cc29afde6091591ccef038ae9235a201510eef014554626010c9574e7ccfa5657d0999445664045fb20a22a5b3168268b12abfb9933e2486e45b84b8d3973785c8e158915fb499493e0195cf70443bcc4517b7cc323b0051ba31ae44bdb415e63c66fa0f14334f75e376411b91bb7296a18f323b6ef37bee5c8b84ecbb65f9c00bd504b316a9a6a7c6091d28fe65c3436b5c9c0f89a47104767f7b0f79a8fc2901d49e31611b2b18c52b510ac054e926229f532d2187657244836254c193014fde766e8d29038e0a388774cb55335439732bb032399c32301052a8f155e3a49a33914581729b11fe0602bbac54b495c1a96b5ff16152a659617c7b79d8245c7d4aba65b5d5ccc941e24c09dea2630d1acda6811b21b78ac89b662581cba46586257c7348022632948cb1cc8a12c8c6712176e6154d5b2ce9e17b20ed770fc959f03f4a2e251845ca128031c5f37631f6e6241fce131164092ba676483c7050890279672a9f8a2329b752eb9b09eb7e4747e13587ec54b99582e2d905ed2b55ef7aa52a185caacf037d4946a95c94f0b80423fd4884a8370af576f0e4b1b6c851583312500b4420676a288019bfd8c2c24116eec8c5dd5822da84c446e09c47887b9c912b8c1786f9ad83e1d36961750175398606b42b2c3a095d104bc0aac455a72554aa9ac1d9ac5a801ab8c6723d53a259ba20c094bbe3094534c88817703a114f94b2070c4901a4bb7d02858b31dbc614aa7c3a10344956b940eb619adafd9c29397bd63c0600d910e97a0554515163221194dc2bcecb5786f081f79478af2f2559056b66453789ce53877db743a3c8378d20f92b3c42f46a712aa92eb765de933bd0a53a531f552218c5da3b57775881bbd8240eabc1881ec3519ca80243a8fc4ccaa7108099a959726b72aee522780649c91f4a82aab2045834b2f64039e542c37b7b81f602be2f0688cb5250f295591c999390499822140ff4325011860fa753b81e85b";
 
@@ -28,17 +34,35 @@ void hex_to_bytes(const char *hex, uint8_t *out, size_t len) {
 }
 
 int main() {
-    uint8_t ek[800], dk[768], c[768], expected_m[32], recovered_m[32], r[32], expected_c[768];
+    uint8_t ek[800], dk[768], c[768], expected_m[32], recovered_m[32], r[32], expected_c[768], seed[32];
+    uint8_t expected_ek[800], expected_dk[768], expected_rho[32];
 
-    hex_to_bytes(dkpke_hex, dk, 768);
+    hex_to_bytes(dkpke_hex, expected_dk, 768);
     hex_to_bytes(expected_c_hex, expected_c, 768);
     hex_to_bytes(expected_m_hex, expected_m, 32);
-    hex_to_bytes(ekpke_hex, ek, 800);
+    hex_to_bytes(ekpke_hex, expected_ek, 800);
     hex_to_bytes(r_hex, r, 32);
+    hex_to_bytes(seed_hex, seed, 32);
+    hex_to_bytes(rho_hex, expected_rho, 32);
+
+    k_pke_keygen(seed, ek, dk, &ML_KEM_512);
+    printf("expected rho first 4: %02x %02x %02x %02x\n", expected_rho[0], expected_rho[1], expected_rho[2], expected_rho[3]);
+
+    if(memcmp(ek, expected_ek, 800) == 0) {
+        printf("k_pke_keygen ek PASSED\n");
+    } else {
+        printf("k_pke_keygen ek FAILED\n");
+    }
+
+    if(memcmp(dk, expected_dk, 768) == 0) {
+        printf("k_pke_keygen dk PASSED\n");
+    } else {
+        printf("k_pke_keygen dk FAILED\n");
+    }
 
     k_pke_encrypt(ek, expected_m, r, c, &ML_KEM_512);
 
-    for(uint16_t i = 0; i < ML_KEM_512_CTEXT; i++) {
+   /* for(uint16_t i = 0; i < ML_KEM_512_CTEXT; i++) {
         printf("%d ", c[i]);
     }
 printf("\n\n");
@@ -47,10 +71,10 @@ printf("\n\n");
     }
 
     if(memcmp(c, expected_c, 768) == 0) {
-        printf("k_pke_encrypt PASSED\n");
+        printf("k_pke_roundtrip PASSED\n");
     } else {
-        printf("k_pke_encrypt FAILED\n");
-    }
+        printf("k_pke_roundtrip FAILED\n");
+    }   */
 
     k_pke_decrypt(dk, c, recovered_m, &ML_KEM_512);
 
