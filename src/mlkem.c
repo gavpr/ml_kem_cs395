@@ -7,7 +7,7 @@
 
 
 //Uses randomness (d,z) to generate an encapsulation key and a corresponding decapsulation key.
-static void ml_kem_keygen_internal(const uint8_t d[], const uint8_t z[], uint8_t ek[], uint8_t dk[], const ml_kem_params *params){
+void ml_kem_keygen_internal(const uint8_t d[], const uint8_t z[], uint8_t ek[], uint8_t dk[], const ml_kem_params *params){
     uint8_t ek_pke[384 * params->k + 32];
     uint8_t dk_pke[384 * params->k];
 
@@ -25,11 +25,11 @@ static void ml_kem_keygen_internal(const uint8_t d[], const uint8_t z[], uint8_t
     memcpy(dk, dk_pke, 384 * params->k);
     memcpy(dk + (384 * params->k), ek, params->ek_size);
     memcpy(dk + (384 * params->k) + params->ek_size, H_out, 32);
-    memcpy(dk + (768 * params->k) + params->ek_size + 32, z, 32);
+    memcpy(dk + (384 * params->k) + params->ek_size + 32, z, 32);
 }
 
 //Uses the encapsulation key and randomness to generate a key and an associated ciphertext.
-static void ml_kem_encaps_internal(const uint8_t ek[], const uint8_t m[], uint8_t ssk[], uint8_t c[], const ml_kem_params *params) {
+void ml_kem_encaps_internal(const uint8_t ek[], const uint8_t m[], uint8_t ssk[], uint8_t c[], const ml_kem_params *params) {
     
     //32 len hash output
     uint8_t H_out[32];
@@ -52,7 +52,7 @@ static void ml_kem_encaps_internal(const uint8_t ek[], const uint8_t m[], uint8_
 }
 
 //Uses the decapsulation key to produce a shared secret key from a ciphertext.
-static void ml_kem_decaps_internal(const uint8_t dk[], const uint8_t c[], uint8_t ssk[], const ml_kem_params *params){
+void ml_kem_decaps_internal(const uint8_t dk[], const uint8_t c[], uint8_t ssk[], const ml_kem_params *params){
     //extract dk_pke
     uint8_t dk_pke[384 * params->k];
     memcpy(dk_pke, dk, 384 * params->k);

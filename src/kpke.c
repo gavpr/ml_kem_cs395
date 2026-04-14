@@ -13,7 +13,7 @@ void k_pke_keygen(const uint8_t d[], uint8_t ek[], uint8_t dk[], const ml_kem_pa
     uint8_t G_input[33];    
     memcpy(G_input, d, 32);
     G_input[32] = params->k; 
-    sha3_512(G_output, G_input, 32);
+    sha3_512(G_output, G_input, 33);
     
     //separate the two pseudorandom keys;
     uint8_t rho[32];

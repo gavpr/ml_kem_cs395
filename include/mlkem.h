@@ -19,4 +19,9 @@ int ml_kem_1024_keygen(uint8_t ek[ML_KEM_1024_EK], uint8_t dk[ML_KEM_1024_DK]);
 int ml_kem_1024_encaps(const uint8_t ek[ML_KEM_1024_EK], uint8_t k[ML_KEM_SSK], uint8_t c[ML_KEM_1024_CTEXT]);
 int ml_kem_1024_decaps(const uint8_t dk[ML_KEM_1024_DK], const uint8_t c[ML_KEM_1024_CTEXT], uint8_t k[ML_KEM_SSK]);
 
+//These three internal functions are usually hidden but defined here for testing purposes
+void ml_kem_keygen_internal(const uint8_t d[], const uint8_t z[], uint8_t ek[], uint8_t dk[], const ml_kem_params *params);
+void ml_kem_encaps_internal(const uint8_t ek[], const uint8_t m[], uint8_t ssk[], uint8_t c[], const ml_kem_params *params);
+void ml_kem_decaps_internal(const uint8_t dk[], const uint8_t c[], uint8_t ssk[], const ml_kem_params *params);
+
 #endif
