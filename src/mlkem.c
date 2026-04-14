@@ -141,3 +141,87 @@ int ml_kem_512_decaps(const uint8_t dk[ML_KEM_512_DK], const uint8_t c[ML_KEM_51
 
     return 0;
 }
+
+int ml_kem_768_keygen(uint8_t ek[ML_KEM_768_EK], uint8_t dk[ML_KEM_768_DK]) {
+    //select parameter set
+    const ml_kem_params *params = &ML_KEM_768;
+
+    //generate two sets of random bytes (32)
+    uint8_t d[32];
+    uint8_t z[32];
+
+    if(randombytes(d, 32) != 0) {
+        return -1;  //bit generation failure
+    }
+
+    if(randombytes(z, 32) != 0) {
+        return -1;  //bit generation failure
+    }
+
+    ml_kem_keygen_internal(d, z, ek, dk, params);
+    return 0;
+}
+
+int ml_kem_768_encaps(const uint8_t ek[ML_KEM_768_EK], uint8_t k[ML_KEM_SSK], uint8_t c[ML_KEM_768_CTEXT]) {
+    //select parameter set
+    const ml_kem_params *params = &ML_KEM_768;
+
+    //m random 32 bytes
+    uint8_t m[32];
+    if(randombytes(m, 32) != 0) {
+        return -1;
+    }
+
+    ml_kem_encaps_internal(ek, m, k, c, params);
+    return 0;
+}
+
+int ml_kem_768_decaps(const uint8_t dk[ML_KEM_768_DK], const uint8_t c[ML_KEM_768_CTEXT], uint8_t k[ML_KEM_SSK]) {
+    //select parameter set
+    const ml_kem_params *params = &ML_KEM_768;
+    ml_kem_decaps_internal(dk, c, k, params);
+
+    return 0;
+}
+
+int ml_kem_1024_keygen(uint8_t ek[ML_KEM_1024_EK], uint8_t dk[ML_KEM_1024_DK]) {
+    //select parameter set
+    const ml_kem_params *params = &ML_KEM_10242;
+
+    //generate two sets of random bytes (32)
+    uint8_t d[32];
+    uint8_t z[32];
+
+    if(randombytes(d, 32) != 0) {
+        return -1;  //bit generation failure
+    }
+
+    if(randombytes(z, 32) != 0) {
+        return -1;  //bit generation failure
+    }
+
+    ml_kem_keygen_internal(d, z, ek, dk, params);
+    return 0;
+}
+
+int ml_kem_1024_encaps(const uint8_t ek[ML_KEM_1024_EK], uint8_t k[ML_KEM_SSK], uint8_t c[ML_KEM_1024_CTEXT]) {
+    //select parameter set
+    const ml_kem_params *params = &ML_KEM_1024;
+
+    //m random 32 bytes
+    uint8_t m[32];
+    if(randombytes(m, 32) != 0) {
+        return -1;
+    }
+
+    ml_kem_encaps_internal(ek, m, k, c, params);
+    return 0;
+}
+
+int ml_kem_1024_decaps(const uint8_t dk[ML_KEM_1024_DK], const uint8_t c[ML_KEM_1024_CTEXT], uint8_t k[ML_KEM_SSK]) {
+    //select parameter set
+    const ml_kem_params *params = &ML_KEM_1024;
+    ml_kem_decaps_internal(dk, c, k, params);
+
+    return 0;
+}
