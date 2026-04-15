@@ -62,7 +62,6 @@ typedef struct {
     uint16_t ctext_size;
 } ml_kem_params;
 
-//vec[i] contains i polynomials
 typedef int16_t poly[ML_KEM_N];    //coefficient array of len N = 256
 typedef poly vec[ML_KEM_K_MAX];
 typedef poly matrix[ML_KEM_K_MAX][ML_KEM_K_MAX];

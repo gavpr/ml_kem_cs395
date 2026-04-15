@@ -186,7 +186,7 @@ int ml_kem_768_decaps(const uint8_t dk[ML_KEM_768_DK], const uint8_t c[ML_KEM_76
 
 int ml_kem_1024_keygen(uint8_t ek[ML_KEM_1024_EK], uint8_t dk[ML_KEM_1024_DK]) {
     //select parameter set
-    const ml_kem_params *params = &ML_KEM_10242;
+    const ml_kem_params *params = &ML_KEM_1024;
 
     //generate two sets of random bytes (32)
     uint8_t d[32];
